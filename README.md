@@ -1,1 +1,1 @@
-# LanguageLearningApp
+LanguageLearningApp is a dynamic web application designed to facilitate language learning through interactive lessons and exercises. This repository contains the core codebase including a JavaScript entry file responsible for rendering the main application component into the Document Object Model (DOM), laying out the foundation for a user-friendly language learning experience.
