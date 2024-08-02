@@ -1,4 +1,3 @@
-// ErrorBoundary.js
 import React, { Component } from "react";
 
 class ErrorBoundary extends Component {
@@ -8,20 +7,26 @@ class ErrorBoundary extends Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
     return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
     this.setState({ errorInfo });
-    console.log({ error, errorInfo });
+    console.error("ErrorBoundary caught an error", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h2>Something went wrong.</h2>;
+      return (
+        <div>
+          <h2>Something went wrong.</h2>
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo.componentStack}
+          </details>
+        </div>
+      );
     }
 
     return this.props.children;
@@ -33,15 +38,17 @@ export default ErrorBoundary;
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import ErrorBoundary from './ErrorBoundary'; // Ensure this path is correct based on your project structure
+import ErrorBoundary from './ErrorBoundary';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const rootElement = document.getElementById('root');
 ReactDOM.render(
-  <ErrorBoundary>
-    <App />
-  </ErrorBoundary>,
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </React.StrictMode>,
   rootElement
 );
