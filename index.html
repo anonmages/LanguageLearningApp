@@ -4,11 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frontend Application Entry Point</title>
+    <style>
+        #learnButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
+        <button id="learnButton" onclick="displayMessage()">Learn Something New!</button>
     </div>
     <script src="config.js"></script>
     <script src="app.js"></script>
+    <script>
+        function displayMessage() {
+            alert('Keep pushing forward with your language learning journey!');
+        }
+    </script>
 </body>
 </html>
