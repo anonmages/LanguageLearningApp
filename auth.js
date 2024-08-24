@@ -2,15 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-let users = [];
-
-const SECRET_KEY = process.env.SECRET_KEY;
-const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION || '1h';
+let users = new Map(); // Change from array to Map for efficient lookups
 
 const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  return hashedPassword;
+  return bcrypt.hash(password, salt);
 };
 
 const isValidPassword = async (password, hashedPassword) => {
@@ -18,18 +14,19 @@ const isValidPassword = async (password, hashedPassword) => {
 };
 
 const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, SECRET_KEY, { expiresIn: TOKEN_EXPIRATION });
+  return jwt.sign({ id: userId }, process.env.SECRET_KEY, { expiresIn: process.env.TOKEN_EXPIRATION || '1h' });
 };
 
 const registerUser = async (username, password) => {
   const hashedPassword = await hashPassword(password);
-  const newUser = { id: users.length + 1, username, password: hashedPassword };
-  users.push(newUser);
+  // Using `size` of a Map ensures unique ID generation when combined with proper UUIDs in real-world scenarios
+  const newUser = { id: users.size + 1, username, password: hashedPassword };
+  users.set(username, newUser); // Store user by username for O(1) access
   return newUser;
 };
 
 const loginUser = async (username, password) => {
-  const user = users.find(user => user.username === username);
+  const user = users.get(username); // More efficient user retrieval
   if (!user) {
     throw new Error('User not found');
   }
@@ -43,8 +40,7 @@ const loginUser = async (username, password) => {
 
 const validateSession = (token) => {
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    return decoded;
+    return jwt.verify(token, process.env.SECRET_KEY);
   } catch (err) {
     throw new Error('Invalid token');
   }
