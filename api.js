@@ -1,56 +1,46 @@
 import fetch from 'node-fetch';
 const BASE_URL = process.env.BASE_URL;
+
+async function fetchAPI(endpoint, options = {}) {
+    try {
+        const url = `${BASE_URL}${endpoint}`;
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error('Network response was not ok.');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(`API request failed for ${endpoint}:`, error);
+        throw error; 
+    }
+}
+
 async function fetchLessons() {
-    try {
-        const response = await fetch(`${BASE_URL}/lessons`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching lessons:', error);
-    }
+    return await fetchAPI(`/lessons`);
 }
+
 async function fetchLessonDetails(lessonId) {
-    try {
-        const response = await fetch(`${BASE_URL}/lessons/${lessonId}`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Error fetching details for lesson ${lessonId}:`, error);
-    }
+    return await fetchAPI(`/lessons/${lessonId}`);
 }
+
 async function fetchQuizzes(lessonId) {
-    try {
-        const response = await fetch(`${BASE_URL}/lessons/${lessonId}/quizzes`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Error fetching quizzes for lesson ${lessonId}:`, error);
-    }
+    return await fetchAPI(`/lessons/${lessonId}/quizzes`);
 }
+
 async function submitQuizAnswers(quizId, answers) {
-    try {
-        const response = await fetch(`${BASE_URL}/quizzes/${quizId}/submit`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(answers),
-        });
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Error submitting answers for quiz ${quizId}:`, error);
-    }
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(answers),
+    };
+    return await fetchAPI(`/quizzes/${quizId}/submit`, options);
 }
+
 async function fetchProgress(userId) {
-    try {
-        const response = await fetch(`${BASE_URL}/users/${userId}/progress`);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error(`Error fetching progress for user ${userId}:`, error);
-    }
+    return await fetchAPI(`/users/${userId}/progress`);
 }
+
 export {
     fetchLessons,
     fetchLessonDetails,
