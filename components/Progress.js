@@ -5,11 +5,13 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 function LearningProgress() {
   const [progressData, setProgressData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProgressData = async () => {
       try {
-        // Check if we have cached data
+        setIsLoading(true);
         const cachedData = sessionStorage.getItem("progressData");
         
         if (cachedData) {
@@ -17,19 +19,29 @@ function LearningProgress() {
         } else {
           const response = await axios.get(`${API_URL}/progress`);
           setProgressData(response.data);
-          // Cache the data
           sessionStorage.setItem("progressData", JSON.stringify(response.data));
         }
       } catch (error) {
         console.error("Failed to fetch progress data:", error);
+        setError(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProgressData();
   }, []);
   
-  if (!progressData) {
+  if (isLoading) {
     return <div>Loading progress...</div>;
+  }
+
+  if (error) {
+    return <div>Failed to load progress. Please try again later.</div>;
+  }
+  
+  if (!progressData) {
+    return <div>No progress data found.</div>;
   }
   
   return (
